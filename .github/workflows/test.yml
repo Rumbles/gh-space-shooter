@@ -6,6 +6,13 @@ on:
       - main
     types: [opened, synchronize, reopened]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   PYTHON_LATEST: 3.12
 
