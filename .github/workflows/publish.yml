@@ -13,6 +13,9 @@ on:
         - minor
         - patch
 
+permissions:
+  contents: write  # bump-my-version pushes the version bump commit + tag; release-action creates the GitHub Release
+
 env:
   PYTHON_LATEST: 3.12
 
@@ -32,7 +35,8 @@ jobs:
 
     - name: Bump version
       id: bump
-      uses: callowayproject/bump-my-version@master
+      # Pinned to the commit behind callowayproject/bump-my-version v1.3.0
+      uses: callowayproject/bump-my-version@e6ecdc3e573698766cd6c2112faeda50bcc2e56a
       env:
         BUMPVERSION_TAG: "false"
       with:

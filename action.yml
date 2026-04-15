@@ -59,29 +59,33 @@ runs:
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.github-token }}
+        USERNAME: ${{ inputs.username }}
+        OUTPUT_PATH: ${{ inputs.output-path }}
+        STRATEGY: ${{ inputs.strategy }}
+        FPS: ${{ inputs.fps }}
       run: |
-        gh-space-shooter ${{ inputs.username }} \
-          --output ${{ inputs.output-path }} \
-          --strategy ${{ inputs.strategy }} \
-          --fps ${{ inputs.fps }}
-        echo "output-file=${{ inputs.output-path }}" >> $GITHUB_OUTPUT
+        gh-space-shooter "$USERNAME" \
+          --output "$OUTPUT_PATH" \
+          --strategy "$STRATEGY" \
+          --fps "$FPS"
+        echo "output-file=$OUTPUT_PATH" >> "$GITHUB_OUTPUT"
 
     - name: Commit and push
       shell: bash
+      env:
+        OUTPUT_PATH: ${{ inputs.output-path }}
+        COMMIT_MSG: ${{ inputs.commit-message }}
+        NO_AMEND: ${{ inputs.no-amend }}
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-
-        OUTPUT_PATH="${{ inputs.output-path }}"
-        COMMIT_MSG="${{ inputs.commit-message }}"
-        NO_AMEND="${{ inputs.no-amend }}"
 
         git add "$OUTPUT_PATH"
 
         SHOULD_AMEND="false"
         if [ "$NO_AMEND" != "true" ]; then
           git log -1 --oneline
-        
+
           LAST_MSG=$(git log -1 --pretty=%s 2>/dev/null || echo "")
           LAST_FILES=$(git log -1 --name-only --pretty=format: 2>/dev/null | grep -v '^$' || echo "")
 
